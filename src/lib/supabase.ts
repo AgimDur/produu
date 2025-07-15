@@ -7,25 +7,47 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env
 console.log('SUPABASE_URL:', supabaseUrl);
 console.log('SUPABASE_ANON_KEY:', supabaseAnonKey ? '***' : 'NOT SET');
 
-// Only throw error in development, in production we'll handle it gracefully
-if (!supabaseUrl || !supabaseAnonKey) {
-  if (process.env.NODE_ENV === 'development') {
-    throw new Error('Supabase environment variables are not properly configured. Please check NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY or SUPABASE_URL and SUPABASE_ANON_KEY.')
+// Create client with proper error handling
+let supabase
+
+try {
+  if (!supabaseUrl || !supabaseAnonKey) {
+    console.error('Supabase environment variables are missing')
+    // Create a dummy client for development/production fallback
+    supabase = createClient(
+      'https://dummy.supabase.co',
+      'dummy-key'
+    )
   } else {
-    console.error('Supabase environment variables are missing in production')
+    supabase = createClient(supabaseUrl, supabaseAnonKey)
   }
+} catch (error) {
+  console.error('Failed to create Supabase client:', error)
+  // Create a dummy client as fallback
+  supabase = createClient(
+    'https://dummy.supabase.co',
+    'dummy-key'
+  )
 }
 
-// Create client with fallback values for production
-export const supabase = createClient(
-  supabaseUrl || 'https://fallback.supabase.co',
-  supabaseAnonKey || 'fallback-key'
-)
+export { supabase }
 
 // Server-side client (for server actions)
 export const createServerClient = () => {
-  return createClient(
-    supabaseUrl || 'https://fallback.supabase.co',
-    supabaseAnonKey || 'fallback-key'
-  )
+  try {
+    if (!supabaseUrl || !supabaseAnonKey) {
+      console.error('Supabase environment variables are missing for server client')
+      return createClient(
+        'https://dummy.supabase.co',
+        'dummy-key'
+      )
+    }
+    return createClient(supabaseUrl, supabaseAnonKey)
+  } catch (error) {
+    console.error('Failed to create server Supabase client:', error)
+    return createClient(
+      'https://dummy.supabase.co',
+      'dummy-key'
+    )
+  }
 } 
