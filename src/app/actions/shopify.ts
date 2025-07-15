@@ -249,3 +249,146 @@ export async function getShopInfo(storeId: string) {
     throw error
   }
 } 
+
+// Sync products from Shopify to local database
+export async function syncProductsFromShopify(storeId: string): Promise<SyncResult> {
+  const supabase = createServerComponentClient({ cookies })
+
+  try {
+    // Get the store
+    const store = await getShopifyStore(storeId)
+    if (!store) {
+      throw new Error('Shopify Store nicht gefunden')
+    }
+
+    // Update sync status
+    await supabase
+      .from('shopify_stores')
+      .update({ sync_status: 'syncing', last_sync_at: new Date().toISOString() })
+      .eq('id', storeId)
+
+    // Initialize Shopify client
+    const client = new ShopifyClient(store)
+    
+    // Get all products from Shopify
+    const shopifyProducts = await client.getProducts()
+    
+    let syncedCount = 0
+    const errors: string[] = []
+
+    for (const shopifyProduct of shopifyProducts) {
+      try {
+        // Get the first variant (main product)
+        const variant = shopifyProduct.variants[0]
+        if (!variant) continue
+
+        // Check if product already exists by SKU
+        const { data: existingProduct } = await supabase
+          .from('products')
+          .select('*')
+          .eq('sku', variant.sku)
+          .single()
+
+        const productData = {
+          name: shopifyProduct.title,
+          sku: variant.sku,
+          ean13: variant.barcode || undefined,
+          description: shopifyProduct.body_html || undefined,
+          price: Math.round(parseFloat(variant.price) * 100), // Convert to cents
+          stock: variant.inventory_quantity || 0,
+          category: shopifyProduct.product_type || 'Uncategorized',
+          sku_level: 'grandparent' as const, // Default to grandparent for imported products
+          parent_id: null
+        }
+
+        if (existingProduct) {
+          // Update existing product
+          const { error: updateError } = await supabase
+            .from('products')
+            .update(productData)
+            .eq('id', existingProduct.id)
+
+          if (updateError) {
+            errors.push(`Fehler beim Aktualisieren von ${variant.sku}: ${updateError.message}`)
+          } else {
+            syncedCount++
+          }
+        } else {
+          // Create new product
+          const { error: insertError } = await supabase
+            .from('products')
+            .insert([productData])
+
+          if (insertError) {
+            errors.push(`Fehler beim Erstellen von ${variant.sku}: ${insertError.message}`)
+          } else {
+            syncedCount++
+          }
+        }
+
+        // Update or create shopify_products mapping
+        const mappingData = {
+          shopify_product_id: shopifyProduct.id,
+          shopify_variant_id: variant.id,
+          shopify_store_id: storeId,
+          last_synced_at: new Date().toISOString(),
+          sync_status: 'synced'
+        }
+
+        if (existingProduct) {
+          await supabase
+            .from('shopify_products')
+            .upsert([{
+              local_product_id: existingProduct.id,
+              ...mappingData
+            }])
+        }
+
+      } catch (error) {
+        const errorMessage = `Fehler bei Produkt ${shopifyProduct.title}: ${error}`
+        errors.push(errorMessage)
+        console.error(errorMessage)
+      }
+    }
+
+    // Update sync status
+    const syncStatus = errors.length === 0 ? 'success' : 'error'
+    await supabase
+      .from('shopify_stores')
+      .update({ 
+        sync_status: syncStatus, 
+        last_sync_at: new Date().toISOString() 
+      })
+      .eq('id', storeId)
+
+    revalidatePath('/dashboard')
+    revalidatePath('/dashboard/shopify')
+    
+    return {
+      success: errors.length === 0,
+      message: errors.length === 0 
+        ? `Erfolgreich ${syncedCount} Produkte von Shopify importiert`
+        : `${syncedCount} Produkte importiert, ${errors.length} Fehler`,
+      synced_products: syncedCount,
+      errors: errors.length > 0 ? errors : undefined
+    }
+
+  } catch (error) {
+    // Update sync status to error
+    await supabase
+      .from('shopify_stores')
+      .update({ 
+        sync_status: 'error', 
+        last_sync_at: new Date().toISOString() 
+      })
+      .eq('id', storeId)
+
+    console.error('Sync from Shopify failed:', error)
+    return {
+      success: false,
+      message: `Import fehlgeschlagen: ${error}`,
+      synced_products: 0,
+      errors: [error as string]
+    }
+  }
+} 

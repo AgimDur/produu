@@ -17,7 +17,8 @@ import { ShopifyStore } from '@/types/shopify'
 import { 
   deleteShopifyStore, 
   testShopifyConnection, 
-  syncProductsToShopify 
+  syncProductsToShopify,
+  syncProductsFromShopify
 } from '@/app/actions/shopify'
 
 interface ShopifyStoreListProps {
@@ -48,22 +49,41 @@ export function ShopifyStoreList({ stores }: ShopifyStoreListProps) {
     }
   }
 
-  const handleSync = async (storeId: string) => {
-    setLoadingStates(prev => ({ ...prev, [`sync-${storeId}`]: true }))
+  const handleSyncToShopify = async (storeId: string) => {
+    setLoadingStates(prev => ({ ...prev, [`sync-to-${storeId}`]: true }))
     setError('')
     setSuccess('')
 
     try {
       const result = await syncProductsToShopify(storeId)
       if (result.success) {
-        setSuccess(`${result.message} - ${result.synced_products} Produkte synchronisiert`)
+        setSuccess(`${result.message} - ${result.synced_products} Produkte zu Shopify synchronisiert`)
       } else {
         setError(result.message)
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten')
     } finally {
-      setLoadingStates(prev => ({ ...prev, [`sync-${storeId}`]: false }))
+      setLoadingStates(prev => ({ ...prev, [`sync-to-${storeId}`]: false }))
+    }
+  }
+
+  const handleSyncFromShopify = async (storeId: string) => {
+    setLoadingStates(prev => ({ ...prev, [`sync-from-${storeId}`]: true }))
+    setError('')
+    setSuccess('')
+
+    try {
+      const result = await syncProductsFromShopify(storeId)
+      if (result.success) {
+        setSuccess(`${result.message} - ${result.synced_products} Produkte von Shopify importiert`)
+      } else {
+        setError(result.message)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [`sync-from-${storeId}`]: false }))
     }
   }
 
@@ -193,13 +213,26 @@ export function ShopifyStoreList({ stores }: ShopifyStoreListProps) {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => handleSync(store.id)}
-                  disabled={loadingStates[`sync-${store.id}`]}
+                  onClick={() => handleSyncToShopify(store.id)}
+                  disabled={loadingStates[`sync-to-${store.id}`]}
                 >
-                  {loadingStates[`sync-${store.id}`] ? (
+                  {loadingStates[`sync-to-${store.id}`] ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />
                   ) : (
-                    'Produkte synchronisieren'
+                    '→ Shopify'
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSyncFromShopify(store.id)}
+                  disabled={loadingStates[`sync-from-${store.id}`]}
+                >
+                  {loadingStates[`sync-from-${store.id}`] ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    '← Shopify'
                   )}
                 </Button>
                 
