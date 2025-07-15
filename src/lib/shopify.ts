@@ -38,7 +38,7 @@ export class ShopifyClient {
   async getProducts(limit = 250): Promise<ShopifyProductData[]> {
     try {
       const products = await this.shopify.product.list({ limit })
-      return products
+      return products as unknown as ShopifyProductData[]
     } catch (error) {
       console.error('Failed to fetch Shopify products:', error)
       throw error
@@ -66,7 +66,7 @@ export class ShopifyClient {
       }
 
       const createdProduct = await this.shopify.product.create(shopifyProduct)
-      return createdProduct
+      return createdProduct as unknown as ShopifyProductData
     } catch (error) {
       console.error('Failed to create Shopify product:', error)
       throw error
@@ -93,7 +93,7 @@ export class ShopifyClient {
       }
 
       const updatedProduct = await this.shopify.product.update(shopifyProductId, updateData)
-      return updatedProduct
+      return updatedProduct as unknown as ShopifyProductData
     } catch (error) {
       console.error('Failed to update Shopify product:', error)
       throw error
@@ -179,7 +179,7 @@ export class ShopifyClient {
   // Get inventory levels for all products
   async getInventoryLevels(): Promise<unknown[]> {
     try {
-      const inventoryLevels = await this.shopify.inventoryLevel.list()
+      const inventoryLevels = await this.shopify.inventoryLevel.list({})
       return inventoryLevels
     } catch (error) {
       console.error('Failed to fetch inventory levels:', error)
