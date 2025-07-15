@@ -20,6 +20,7 @@ import {
   syncProductsToShopify,
   syncProductsFromShopify
 } from '@/app/actions/shopify'
+import { syncOrdersFromShopify } from '@/app/actions/orders'
 
 interface ShopifyStoreListProps {
   stores: ShopifyStore[]
@@ -84,6 +85,25 @@ export function ShopifyStoreList({ stores }: ShopifyStoreListProps) {
       setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten')
     } finally {
       setLoadingStates(prev => ({ ...prev, [`sync-from-${storeId}`]: false }))
+    }
+  }
+
+  const handleSyncOrdersFromShopify = async (storeId: string) => {
+    setLoadingStates(prev => ({ ...prev, [`sync-orders-${storeId}`]: true }))
+    setError('')
+    setSuccess('')
+
+    try {
+      const result = await syncOrdersFromShopify(storeId)
+      if (result.success) {
+        setSuccess(`${result.message} - ${result.synced_orders} Bestellungen von Shopify importiert`)
+      } else {
+        setError(result.message)
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Ein Fehler ist aufgetreten')
+    } finally {
+      setLoadingStates(prev => ({ ...prev, [`sync-orders-${storeId}`]: false }))
     }
   }
 
@@ -232,7 +252,20 @@ export function ShopifyStoreList({ stores }: ShopifyStoreListProps) {
                   {loadingStates[`sync-from-${store.id}`] ? (
                     <RefreshCw className="h-4 w-4 animate-spin" />
                   ) : (
-                    '← Shopify'
+                    '← Produkte'
+                  )}
+                </Button>
+                
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleSyncOrdersFromShopify(store.id)}
+                  disabled={loadingStates[`sync-orders-${store.id}`]}
+                >
+                  {loadingStates[`sync-orders-${store.id}`] ? (
+                    <RefreshCw className="h-4 w-4 animate-spin" />
+                  ) : (
+                    '← Bestellungen'
                   )}
                 </Button>
                 

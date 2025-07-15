@@ -1,5 +1,6 @@
 import Shopify from 'shopify-api-node'
 import { ShopifyStore, ShopifyProductData, SyncResult } from '@/types/shopify'
+import { ShopifyOrder, ShopifyOrderItem } from '@/types/order'
 import { Product } from '@/types/product'
 
 export class ShopifyClient {
@@ -41,6 +42,28 @@ export class ShopifyClient {
       return products as unknown as ShopifyProductData[]
     } catch (error) {
       console.error('Failed to fetch Shopify products:', error)
+      throw error
+    }
+  }
+
+  // Get all orders from Shopify
+  async getOrders(limit = 250, status = 'any'): Promise<ShopifyOrder[]> {
+    try {
+      const orders = await this.shopify.order.list({ limit, status })
+      return orders as unknown as ShopifyOrder[]
+    } catch (error) {
+      console.error('Failed to fetch Shopify orders:', error)
+      throw error
+    }
+  }
+
+  // Get a single order by ID
+  async getOrder(orderId: number): Promise<ShopifyOrder> {
+    try {
+      const order = await this.shopify.order.get(orderId)
+      return order as unknown as ShopifyOrder
+    } catch (error) {
+      console.error('Failed to fetch Shopify order:', error)
       throw error
     }
   }

@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
-import { LogOut, Package, ShoppingCart } from 'lucide-react'
+import { LogOut, Package, ShoppingCart, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -54,6 +54,17 @@ export default function DashboardLayout({
                 >
                   <ShoppingCart className="h-4 w-4 mr-2" />
                   Shopify Integration
+                </Link>
+                <Link 
+                  href="/dashboard/orders" 
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    pathname === '/dashboard/orders' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  <ShoppingBag className="h-4 w-4 mr-2" />
+                  Bestellungen
                 </Link>
               </div>
             </nav>
