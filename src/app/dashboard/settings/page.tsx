@@ -6,7 +6,11 @@ import { getShopifyStores, syncProductsToShopify, syncProductsFromShopify } from
 import { getOrderStats } from '@/app/actions/orders'
 import { Settings, Store, Package, ShoppingCart, RefreshCw } from 'lucide-react'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 export default async function SettingsPage() {
+  // Force dynamic rendering to avoid static generation issues
   const stores = await getShopifyStores()
   const stats = await getOrderStats()
 

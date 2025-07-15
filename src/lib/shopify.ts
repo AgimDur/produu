@@ -202,10 +202,42 @@ export class ShopifyClient {
   // Get inventory levels for all products
   async getInventoryLevels(): Promise<unknown[]> {
     try {
-      const inventoryLevels = await this.shopify.inventoryLevel.list({})
+      const inventoryLevels = await this.shopify.inventoryLevel.list()
       return inventoryLevels
     } catch (error) {
       console.error('Failed to fetch inventory levels:', error)
+      throw error
+    }
+  }
+
+  // Get all webhooks
+  async getWebhooks(): Promise<any[]> {
+    try {
+      const webhooks = await this.shopify.webhook.list()
+      return webhooks
+    } catch (error) {
+      console.error('Failed to fetch webhooks:', error)
+      throw error
+    }
+  }
+
+  // Create a webhook
+  async createWebhook(webhookData: any): Promise<any> {
+    try {
+      const webhook = await this.shopify.webhook.create(webhookData)
+      return webhook
+    } catch (error) {
+      console.error('Failed to create webhook:', error)
+      throw error
+    }
+  }
+
+  // Delete a webhook
+  async deleteWebhook(webhookId: number): Promise<void> {
+    try {
+      await this.shopify.webhook.delete(webhookId)
+    } catch (error) {
+      console.error('Failed to delete webhook:', error)
       throw error
     }
   }

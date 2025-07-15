@@ -392,3 +392,106 @@ export async function syncProductsFromShopify(storeId: string): Promise<SyncResu
     }
   }
 } 
+
+// Register Shopify webhooks for automatic order sync
+export async function registerShopifyWebhooks(storeId: string): Promise<boolean> {
+  try {
+    const store = await getShopifyStore(storeId)
+    if (!store) {
+      throw new Error('Shopify Store nicht gefunden')
+    }
+
+    const client = new ShopifyClient(store)
+    
+    // Webhook-URL (deine Vercel-Domain)
+    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://your-app.vercel.app'}/api/shopify-webhook`
+    
+    // Webhook-Topics für Bestellungen
+    const webhookTopics = [
+      'orders/create',
+      'orders/updated',
+      'orders/cancelled',
+      'orders/fulfilled',
+      'orders/partially_fulfilled'
+    ]
+
+    let successCount = 0
+
+    for (const topic of webhookTopics) {
+      try {
+        // Prüfe ob Webhook bereits existiert
+        const existingWebhooks = await client.getWebhooks()
+        const existingWebhook = existingWebhooks.find(wh => 
+          wh.topic === topic && wh.address === webhookUrl
+        )
+
+        if (existingWebhook) {
+          console.log(`Webhook für ${topic} bereits registriert`)
+          successCount++
+          continue
+        }
+
+        // Erstelle neuen Webhook
+        const webhookData = {
+          topic: topic,
+          address: webhookUrl,
+          format: 'json'
+        }
+
+        const result = await client.createWebhook(webhookData)
+        
+        if (result) {
+          console.log(`Webhook für ${topic} erfolgreich registriert`)
+          successCount++
+        } else {
+          console.error(`Fehler beim Registrieren des Webhooks für ${topic}`)
+        }
+      } catch (error) {
+        console.error(`Fehler beim Registrieren des Webhooks für ${topic}:`, error)
+      }
+    }
+
+    console.log(`${successCount}/${webhookTopics.length} Webhooks erfolgreich registriert`)
+    return successCount === webhookTopics.length
+
+  } catch (error) {
+    console.error('Fehler beim Registrieren der Webhooks:', error)
+    return false
+  }
+}
+
+// Delete all webhooks for a store
+export async function deleteShopifyWebhooks(storeId: string): Promise<boolean> {
+  try {
+    const store = await getShopifyStore(storeId)
+    if (!store) {
+      throw new Error('Shopify Store nicht gefunden')
+    }
+
+    const client = new ShopifyClient(store)
+    const webhooks = await client.getWebhooks()
+    
+    const webhookUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'https://your-app.vercel.app'}/api/shopify-webhook`
+    
+    let deletedCount = 0
+    
+    for (const webhook of webhooks) {
+      if (webhook.address === webhookUrl) {
+        try {
+          await client.deleteWebhook(webhook.id)
+          console.log(`Webhook ${webhook.topic} gelöscht`)
+          deletedCount++
+        } catch (error) {
+          console.error(`Fehler beim Löschen des Webhooks ${webhook.topic}:`, error)
+        }
+      }
+    }
+
+    console.log(`${deletedCount} Webhooks gelöscht`)
+    return true
+
+  } catch (error) {
+    console.error('Fehler beim Löschen der Webhooks:', error)
+    return false
+  }
+} 
