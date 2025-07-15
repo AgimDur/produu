@@ -2,6 +2,7 @@ import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { AddProductButton } from '@/components/AddProductButton'
+import { ExportButtons } from '@/components/ExportButtons'
 import { Product } from '@/types/product'
 import React from 'react'
 
@@ -25,7 +26,10 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Produkte</h1>
-        <AddProductButton />
+        <div className="flex gap-2">
+          <ExportButtons type="products" />
+          <AddProductButton />
+        </div>
       </div>
       <div className="bg-white rounded-lg shadow">
         <Table>

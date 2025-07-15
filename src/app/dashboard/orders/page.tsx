@@ -3,6 +3,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
+import { ExportButtons } from '@/components/ExportButtons'
 import { getOrderStats } from '@/app/actions/orders'
 import { Order } from '@/types/order'
 
@@ -49,6 +50,7 @@ export default async function OrdersPage() {
     <div className="space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Bestellungen</h1>
+        <ExportButtons type="orders" />
       </div>
 
       {/* Statistics Cards */}
