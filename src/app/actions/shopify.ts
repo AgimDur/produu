@@ -10,6 +10,7 @@ import {
   UpdateShopifyStoreData,
   SyncResult 
 } from '@/types/shopify'
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Product } from '@/types/product'
 
 // Get all Shopify stores
