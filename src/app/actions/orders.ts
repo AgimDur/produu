@@ -4,7 +4,7 @@ import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { revalidatePath } from 'next/cache'
 import { ShopifyClient } from '@/lib/shopify'
-import { Order, OrderItem, ShopifyOrder, SyncResult } from '@/types/order'
+import { Order, OrderItem, SyncResult } from '@/types/order'
 import { getShopifyStore } from './shopify'
 
 // Get all orders

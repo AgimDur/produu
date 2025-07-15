@@ -14,8 +14,8 @@ export interface Order {
   financial_status: string
   fulfillment_status: string
   order_status: string
-  shipping_address?: any
-  billing_address?: any
+  shipping_address?: unknown
+  billing_address?: unknown
   tags?: string
   note?: string
   processed_at?: string
@@ -82,152 +82,28 @@ export interface ShopifyOrder {
   landing_site?: string
   landing_site_ref?: string
   referring_site?: string
-  marketing_attribution_attribution?: string
-  marketing_attribution_attribution_1?: string
-  marketing_attribution_attribution_2?: string
-  marketing_attribution_attribution_3?: string
-  marketing_attribution_attribution_4?: string
-  marketing_attribution_attribution_5?: string
-  marketing_attribution_attribution_6?: string
-  marketing_attribution_attribution_7?: string
-  marketing_attribution_attribution_8?: string
-  marketing_attribution_attribution_9?: string
-  marketing_attribution_attribution_10?: string
-  marketing_attribution_attribution_11?: string
-  marketing_attribution_attribution_12?: string
-  marketing_attribution_attribution_13?: string
-  marketing_attribution_attribution_14?: string
-  marketing_attribution_attribution_15?: string
-  marketing_attribution_attribution_16?: string
-  marketing_attribution_attribution_17?: string
-  marketing_attribution_attribution_18?: string
-  marketing_attribution_attribution_19?: string
-  marketing_attribution_attribution_20?: string
-  marketing_attribution_attribution_21?: string
-  marketing_attribution_attribution_22?: string
-  marketing_attribution_attribution_23?: string
-  marketing_attribution_attribution_24?: string
-  marketing_attribution_attribution_25?: string
-  marketing_attribution_attribution_26?: string
-  marketing_attribution_attribution_27?: string
-  marketing_attribution_attribution_28?: string
-  marketing_attribution_attribution_29?: string
-  marketing_attribution_attribution_30?: string
-  marketing_attribution_attribution_31?: string
-  marketing_attribution_attribution_32?: string
-  marketing_attribution_attribution_33?: string
-  marketing_attribution_attribution_34?: string
-  marketing_attribution_attribution_35?: string
-  marketing_attribution_attribution_36?: string
-  marketing_attribution_attribution_37?: string
-  marketing_attribution_attribution_38?: string
-  marketing_attribution_attribution_39?: string
-  marketing_attribution_attribution_40?: string
-  marketing_attribution_attribution_41?: string
-  marketing_attribution_attribution_42?: string
-  marketing_attribution_attribution_43?: string
-  marketing_attribution_attribution_44?: string
-  marketing_attribution_attribution_45?: string
-  marketing_attribution_attribution_46?: string
-  marketing_attribution_attribution_47?: string
-  marketing_attribution_attribution_48?: string
-  marketing_attribution_attribution_49?: string
-  marketing_attribution_attribution_50?: string
-  marketing_attribution_attribution_51?: string
-  marketing_attribution_attribution_52?: string
-  marketing_attribution_attribution_53?: string
-  marketing_attribution_attribution_54?: string
-  marketing_attribution_attribution_55?: string
-  marketing_attribution_attribution_56?: string
-  marketing_attribution_attribution_57?: string
-  marketing_attribution_attribution_58?: string
-  marketing_attribution_attribution_59?: string
-  marketing_attribution_attribution_60?: string
-  marketing_attribution_attribution_61?: string
-  marketing_attribution_attribution_62?: string
-  marketing_attribution_attribution_63?: string
-  marketing_attribution_attribution_64?: string
-  marketing_attribution_attribution_65?: string
-  marketing_attribution_attribution_66?: string
-  marketing_attribution_attribution_67?: string
-  marketing_attribution_attribution_68?: string
-  marketing_attribution_attribution_69?: string
-  marketing_attribution_attribution_70?: string
-  marketing_attribution_attribution_71?: string
-  marketing_attribution_attribution_72?: string
-  marketing_attribution_attribution_73?: string
-  marketing_attribution_attribution_74?: string
-  marketing_attribution_attribution_75?: string
-  marketing_attribution_attribution_76?: string
-  marketing_attribution_attribution_77?: string
-  marketing_attribution_attribution_78?: string
-  marketing_attribution_attribution_79?: string
-  marketing_attribution_attribution_80?: string
-  marketing_attribution_attribution_81?: string
-  marketing_attribution_attribution_82?: string
-  marketing_attribution_attribution_83?: string
-  marketing_attribution_attribution_84?: string
-  marketing_attribution_attribution_85?: string
-  marketing_attribution_attribution_86?: string
-  marketing_attribution_attribution_87?: string
-  marketing_attribution_attribution_88?: string
-  marketing_attribution_attribution_89?: string
-  marketing_attribution_attribution_90?: string
-  marketing_attribution_attribution_91?: string
-  marketing_attribution_attribution_92?: string
-  marketing_attribution_attribution_93?: string
-  marketing_attribution_attribution_94?: string
-  marketing_attribution_attribution_95?: string
-  marketing_attribution_attribution_96?: string
-  marketing_attribution_attribution_97?: string
-  marketing_attribution_attribution_98?: string
-  marketing_attribution_attribution_99?: string
-  marketing_attribution_attribution_100?: string
   order_number: string
-  shipping_lines: any[]
-  billing_address?: any
-  shipping_address?: any
-  fulfillments: any[]
-  client_details?: any
+  shipping_lines: unknown[]
+  billing_address?: unknown
+  shipping_address?: unknown
+  fulfillments: unknown[]
+  client_details?: unknown
   line_items: ShopifyOrderItem[]
-  payment_details?: any
-  refunds: any[]
-  customer?: any
+  payment_details?: unknown
+  refunds: unknown[]
+  customer?: unknown
   tags: string
-  note_attributes: any[]
-  properties: any[]
-  total_discounts: string
+  note_attributes: unknown[]
+  properties: unknown[]
   total_line_items_price: string
   total_outstanding: string
   total_tip_received: string
   original_total_duties_set: string
   current_total_duties_set: string
   admin_graphql_api_id: string
-  shipping_lines: any[]
-  discount_codes: any[]
-  discount_applications: any[]
-  customer_locale?: string
+  discount_codes: unknown[]
+  discount_applications: unknown[]
   presentment_currency?: string
-  total_price_set?: any
-  subtotal_price_set?: any
-  total_shipping_price_set?: any
-  total_tax_set?: any
-  total_discounts_set?: any
-  total_line_items_price_set?: any
-  total_outstanding_set?: any
-  total_tip_received_set?: any
-  total_duties_set?: any
-  current_total_duties_set?: any
-  total_price_usd_set?: any
-  subtotal_price_usd_set?: any
-  total_shipping_price_usd_set?: any
-  total_tax_usd_set?: any
-  total_discounts_usd_set?: any
-  total_line_items_price_usd_set?: any
-  total_outstanding_usd_set?: any
-  total_tip_received_usd_set?: any
-  total_duties_usd_set?: any
-  current_total_duties_usd_set?: any
 }
 
 export interface ShopifyOrderItem {
@@ -245,19 +121,19 @@ export interface ShopifyOrderItem {
   gift_card: boolean
   name: string
   variant_inventory_management: string
-  properties: any[]
+  properties: unknown[]
   product_exists: boolean
   fulfillable_quantity: number
   grams: number
   price: string
   total_discount: string
   fulfillment_status?: string
-  price_set: any
-  total_discount_set: any
-  discount_allocations: any[]
-  duties: any[]
+  price_set: unknown
+  total_discount_set: unknown
+  discount_allocations: unknown[]
+  duties: unknown[]
   admin_graphql_api_id: string
-  tax_lines: any[]
+  tax_lines: unknown[]
 }
 
 export interface SyncResult {

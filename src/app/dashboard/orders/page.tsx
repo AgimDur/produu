@@ -3,7 +3,7 @@ import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { getOrders, getOrderStats } from '@/app/actions/orders'
+import { getOrderStats } from '@/app/actions/orders'
 import { Order } from '@/types/order'
 
 export default async function OrdersPage() {

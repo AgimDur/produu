@@ -1,6 +1,6 @@
 import Shopify from 'shopify-api-node'
 import { ShopifyStore, ShopifyProductData, SyncResult } from '@/types/shopify'
-import { ShopifyOrder, ShopifyOrderItem } from '@/types/order'
+import { ShopifyOrder } from '@/types/order'
 import { Product } from '@/types/product'
 
 export class ShopifyClient {
