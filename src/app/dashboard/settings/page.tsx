@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { ShopifyStoreForm } from '@/components/ShopifyStoreForm'
-import { getShopifyStores, syncProductsToShopify, syncProductsFromShopify } from '@/app/actions/shopify'
+import { getShopifyStores, syncProductsToShopify, syncProductsFromShopify, registerShopifyWebhooks } from '@/app/actions/shopify'
 import { getOrderStats } from '@/app/actions/orders'
 import { Settings, Store, Package, ShoppingCart, RefreshCw } from 'lucide-react'
 
@@ -90,6 +90,40 @@ export default async function SettingsPage() {
               </div>
             </div>
           )}
+
+          {/* Webhook Management */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Webhook Management</h3>
+            <div className="flex gap-2 mb-6">
+              <form action={async () => {
+                'use server'
+                if (stores.length > 0) {
+                  const success = await registerShopifyWebhooks(stores[0].id)
+                  console.log('Webhook registration result:', success)
+                }
+              }}>
+                <Button type="submit" variant="outline" size="sm" className="flex items-center gap-2">
+                  <RefreshCw className="h-4 w-4" />
+                  Webhooks registrieren
+                </Button>
+              </form>
+              
+              <form action={async () => {
+                'use server'
+                // Test webhook functionality
+                const response = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/shopify-webhook/test`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' }
+                })
+                const result = await response.json()
+                console.log('Test webhook result:', result)
+              }}>
+                <Button type="submit" variant="outline" size="sm" className="flex items-center gap-2">
+                  🧪 Test Webhook
+                </Button>
+              </form>
+            </div>
+          </div>
 
           {/* Sync Status */}
           <div>
