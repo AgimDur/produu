@@ -2,7 +2,6 @@ import { cookies } from 'next/headers'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { ShopifyStoreForm } from '@/components/ShopifyStoreForm'
 import { ShopifyStoreList } from '@/components/ShopifyStoreList'
-import { ShopifyStore } from '@/types/shopify'
 
 export default async function ShopifyPage() {
   const supabase = createServerComponentClient({ cookies })

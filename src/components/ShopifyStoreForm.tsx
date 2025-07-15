@@ -10,7 +10,6 @@ import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { createShopifyStore } from '@/app/actions/shopify'
-import { CreateShopifyStoreData } from '@/types/shopify'
 
 const storeSchema = z.object({
   store_name: z.string().min(1, 'Store Name ist erforderlich'),
