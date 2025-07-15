@@ -211,6 +211,7 @@ export class ShopifyClient {
   }
 
   // Get all webhooks
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async getWebhooks(): Promise<any[]> {
     try {
       const webhooks = await this.shopify.webhook.list()
@@ -222,6 +223,7 @@ export class ShopifyClient {
   }
 
   // Create a webhook
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async createWebhook(webhookData: any): Promise<any> {
     try {
       const webhook = await this.shopify.webhook.create(webhookData)

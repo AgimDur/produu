@@ -25,6 +25,7 @@ function verifyShopifyWebhook(rawBody: string, hmacHeader: string | null): boole
 }
 
 // Bestellung aus Shopify-Daten verarbeiten
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function processOrder(orderData: any, topic: string) {
   const supabase = createServerComponentClient({ cookies })
   
