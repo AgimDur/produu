@@ -2,13 +2,16 @@
 
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
-import { LogOut, Package } from 'lucide-react'
+import { LogOut, Package, ShoppingCart } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const pathname = usePathname()
   const handleLogout = async () => {
     await supabase.auth.signOut()
     window.location.href = '/'
@@ -30,9 +33,28 @@ export default function DashboardLayout({
                 Navigation
               </div>
               <div className="space-y-1">
-                <div className="px-3 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-md">
+                <Link 
+                  href="/dashboard" 
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    pathname === '/dashboard' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  <Package className="h-4 w-4 mr-2" />
                   Produkte
-                </div>
+                </Link>
+                <Link 
+                  href="/dashboard/shopify" 
+                  className={`flex items-center px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                    pathname === '/dashboard/shopify' 
+                      ? 'text-blue-600 bg-blue-50' 
+                      : 'text-gray-700 hover:text-blue-600 hover:bg-blue-50'
+                  }`}
+                >
+                  <ShoppingCart className="h-4 w-4 mr-2" />
+                  Shopify Integration
+                </Link>
               </div>
             </nav>
           </div>
