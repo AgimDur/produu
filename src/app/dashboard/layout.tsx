@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
-import { LogOut, Package, ShoppingBag, Settings } from 'lucide-react'
+import { LogOut, Package, ShoppingBag, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
@@ -19,19 +19,40 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Top Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="flex justify-between items-center px-6 py-4">
+          <div className="flex items-center space-x-2">
+            <Package className="h-6 w-6 text-blue-600" />
+            <h1 className="text-xl font-semibold">Produkt-Management</h1>
+          </div>
+          
+          {/* Profile/Logout Button */}
+          <div className="flex items-center space-x-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleLogout}
+              className="flex items-center gap-2"
+            >
+              <User className="h-4 w-4" />
+              Abmelden
+            </Button>
+          </div>
+        </div>
+      </div>
+
       <div className="flex">
         {/* Sidebar */}
         <div className="w-64 bg-white shadow-sm min-h-screen">
-          <div className="p-6">
-            <div className="flex items-center space-x-2 mb-8">
-              <Package className="h-6 w-6 text-blue-600" />
-              <h1 className="text-xl font-semibold">Produkt-Management</h1>
+          <div className="p-6 pt-4">
+            <div className="mb-8">
+              <h2 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-4">
+                Navigation
+              </h2>
             </div>
             
             <nav className="space-y-2">
-              <div className="px-3 py-2 text-sm font-medium text-gray-500 uppercase tracking-wider">
-                Navigation
-              </div>
               <div className="space-y-1">
                 <Link 
                   href="/dashboard" 
@@ -68,17 +89,6 @@ export default function DashboardLayout({
                 </Link>
               </div>
             </nav>
-          </div>
-          
-          <div className="absolute bottom-6 left-6 right-6">
-            <Button 
-              variant="outline" 
-              className="w-full" 
-              onClick={handleLogout}
-            >
-              <LogOut className="h-4 w-4 mr-2" />
-              Abmelden
-            </Button>
           </div>
         </div>
 
