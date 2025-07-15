@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 
 // Support both naming conventions for environment variables
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL
@@ -7,8 +7,8 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || process.env
 console.log('SUPABASE_URL:', supabaseUrl);
 console.log('SUPABASE_ANON_KEY:', supabaseAnonKey ? '***' : 'NOT SET');
 
-// Create client with proper error handling
-let supabase
+// Create client with proper error handling and typing
+let supabase: SupabaseClient
 
 try {
   if (!supabaseUrl || !supabaseAnonKey) {
@@ -33,7 +33,7 @@ try {
 export { supabase }
 
 // Server-side client (for server actions)
-export const createServerClient = () => {
+export const createServerClient = (): SupabaseClient => {
   try {
     if (!supabaseUrl || !supabaseAnonKey) {
       console.error('Supabase environment variables are missing for server client')
