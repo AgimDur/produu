@@ -80,7 +80,7 @@ export function ProductForm({ open, onOpenChange, product, onSubmit }: ProductFo
       setParentOptions((data as ParentOption[]) || [])
     }
     fetchParents()
-  }, [open, form.watch('sku_level')])
+  }, [open, form, supabase])
 
   const handleSubmit = async (data: ProductFormData) => {
     setLoading(true)

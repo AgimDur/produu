@@ -89,17 +89,22 @@ export async function syncOrdersFromShopify(storeId: string): Promise<SyncResult
           shopify_store_id: storeId,
           order_number: shopifyOrder.order_number,
           customer_email: shopifyOrder.email,
-          customer_first_name: shopifyOrder.customer?.first_name,
-          customer_last_name: shopifyOrder.customer?.last_name,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          customer_first_name: (shopifyOrder.customer as any)?.first_name || null,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          customer_last_name: (shopifyOrder.customer as any)?.last_name || null,
           total_price: Math.round(parseFloat(shopifyOrder.total_price) * 100), // Convert to cents
           subtotal_price: Math.round(parseFloat(shopifyOrder.subtotal_price) * 100),
           total_tax: Math.round(parseFloat(shopifyOrder.total_tax) * 100),
           currency: shopifyOrder.currency,
           financial_status: shopifyOrder.financial_status,
-          fulfillment_status: shopifyOrder.fulfillments?.length > 0 ? 'fulfilled' : 'unfulfilled',
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          fulfillment_status: (shopifyOrder.fulfillments as any)?.length > 0 ? 'fulfilled' : 'unfulfilled',
           order_status: shopifyOrder.cancelled_at ? 'cancelled' : 'open',
-          shipping_address: shopifyOrder.shipping_address,
-          billing_address: shopifyOrder.billing_address,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          shipping_address: shopifyOrder.shipping_address as any,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          billing_address: shopifyOrder.billing_address as any,
           tags: shopifyOrder.tags,
           note: shopifyOrder.note,
           processed_at: shopifyOrder.processed_at,
@@ -139,7 +144,8 @@ export async function syncOrdersFromShopify(storeId: string): Promise<SyncResult
         }
 
         // Sync order items
-        for (const lineItem of shopifyOrder.line_items) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        for (const lineItem of (shopifyOrder.line_items as any[])) {
           try {
             // Check if order item already exists
             const { data: existingItem } = await supabase
