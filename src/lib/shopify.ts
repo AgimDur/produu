@@ -202,7 +202,7 @@ export class ShopifyClient {
   // Get inventory levels for all products
   async getInventoryLevels(): Promise<unknown[]> {
     try {
-      const inventoryLevels = await this.shopify.inventoryLevel.list()
+      const inventoryLevels = await this.shopify.inventoryLevel.list({})
       return inventoryLevels
     } catch (error) {
       console.error('Failed to fetch inventory levels:', error)
