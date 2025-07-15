@@ -12,18 +12,37 @@ let supabase: SupabaseClient
 
 try {
   if (!supabaseUrl || !supabaseAnonKey) {
-    console.error('Supabase environment variables are missing')
-    // Create a dummy client for development/production fallback
+    console.error('❌ Supabase environment variables are missing')
+    console.error('Required variables: NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY')
+    
+    // In production, we should throw an error instead of creating a dummy client
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('Supabase environment variables are not configured')
+    }
+    
+    // Create a dummy client for development only
     supabase = createClient(
       'https://dummy.supabase.co',
       'dummy-key'
     )
   } else {
-    supabase = createClient(supabaseUrl, supabaseAnonKey)
+    supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true
+      }
+    })
   }
 } catch (error) {
-  console.error('Failed to create Supabase client:', error)
-  // Create a dummy client as fallback
+  console.error('❌ Failed to create Supabase client:', error)
+  
+  // In production, we should throw an error
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('Failed to initialize Supabase client')
+  }
+  
+  // Create a dummy client as fallback for development only
   supabase = createClient(
     'https://dummy.supabase.co',
     'dummy-key'
@@ -36,18 +55,17 @@ export { supabase }
 export const createServerClient = (): SupabaseClient => {
   try {
     if (!supabaseUrl || !supabaseAnonKey) {
-      console.error('Supabase environment variables are missing for server client')
-      return createClient(
-        'https://dummy.supabase.co',
-        'dummy-key'
-      )
+      console.error('❌ Supabase environment variables are missing for server client')
+      throw new Error('Supabase environment variables are not configured for server client')
     }
-    return createClient(supabaseUrl, supabaseAnonKey)
+    return createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false
+      }
+    })
   } catch (error) {
-    console.error('Failed to create server Supabase client:', error)
-    return createClient(
-      'https://dummy.supabase.co',
-      'dummy-key'
-    )
+    console.error('❌ Failed to create server Supabase client:', error)
+    throw new Error('Failed to initialize server Supabase client')
   }
 } 
