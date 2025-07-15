@@ -17,24 +17,7 @@ export default function LoginPage() {
   const router = useRouter()
   
   // Handle Supabase client creation with error handling
-  let supabase
-  try {
-    supabase = useSupabaseClient()
-  } catch (err) {
-    console.error('Failed to create Supabase client:', err)
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Konfigurationsfehler</CardTitle>
-            <CardDescription>
-              Die Supabase-Konfiguration ist nicht korrekt. Bitte überprüfen Sie die Umgebungsvariablen.
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-    )
-  }
+  const supabase = useSupabaseClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()

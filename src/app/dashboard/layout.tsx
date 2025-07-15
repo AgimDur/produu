@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button'
 import { supabase } from '@/lib/supabase'
-import { LogOut, Package, ShoppingBag, Settings, User } from 'lucide-react'
+import { Package, ShoppingBag, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
