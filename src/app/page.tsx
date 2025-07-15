@@ -14,14 +14,14 @@ export default function LoginPage() {
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [configError, setConfigError] = useState(false)
   const router = useRouter()
   
-  // Handle Supabase client creation with error handling
-  let supabase
-  try {
-    supabase = useSupabaseClient()
-  } catch (error) {
-    console.error('Failed to create Supabase client:', error)
+  // Call useSupabaseClient at the top level
+  const supabase = useSupabaseClient()
+
+  // Check if Supabase client is properly configured
+  if (!supabase || configError) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <Card className="w-full max-w-md">
