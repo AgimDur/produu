@@ -1,10 +1,10 @@
 'use client'
 
 import { Button } from '@/components/ui/button'
-import { supabase } from '@/lib/supabase'
 import { Package, ShoppingBag, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { SignOutButton } from '@clerk/nextjs'
 
 export default function DashboardLayout({
   children,
@@ -12,10 +12,6 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   const pathname = usePathname()
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    window.location.href = '/'
-  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,15 +25,16 @@ export default function DashboardLayout({
           
           {/* Profile/Logout Button */}
           <div className="flex items-center space-x-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleLogout}
-              className="flex items-center gap-2"
-            >
-              <User className="h-4 w-4" />
-              Abmelden
-            </Button>
+            <SignOutButton>
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+              >
+                <User className="h-4 w-4" />
+                Abmelden
+              </Button>
+            </SignOutButton>
           </div>
         </div>
       </div>

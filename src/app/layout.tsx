@@ -1,19 +1,25 @@
-'use client'
-import { useState } from 'react'
-import { createPagesBrowserClient } from '@supabase/auth-helpers-nextjs'
-import { SessionContextProvider } from '@supabase/auth-helpers-react'
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import './globals.css'
+import { ClerkProvider } from '@clerk/nextjs'
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const [supabase] = useState(() => createPagesBrowserClient())
+const inter = Inter({ subsets: ['latin'] })
 
+export const metadata: Metadata = {
+  title: 'Produkt-Management',
+  description: 'Ein einfaches Produkt-Management-System',
+}
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   return (
-    <html lang="de">
-      <body>
-        <SessionContextProvider supabaseClient={supabase}>
-          {children}
-        </SessionContextProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="de">
+        <body className={inter.className}>{children}</body>
+      </html>
+    </ClerkProvider>
   )
 }
