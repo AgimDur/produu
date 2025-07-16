@@ -4,12 +4,12 @@ export interface ShopifyStore {
   store_name: string
   shopify_domain: string
   access_token: string
-  api_key?: string
-  api_secret?: string
+  api_key: string
+  api_secret: string
   webhook_secret?: string
   is_active: boolean
+  sync_status: 'idle' | 'syncing' | 'success' | 'error'
   last_sync_at?: string
-  sync_status: 'idle' | 'syncing' | 'error' | 'success'
 }
 
 export interface ShopifyProduct {
@@ -27,8 +27,8 @@ export interface CreateShopifyStoreData {
   store_name: string
   shopify_domain: string
   access_token: string
-  api_key?: string
-  api_secret?: string
+  api_key: string
+  api_secret: string
   webhook_secret?: string
 }
 
@@ -111,5 +111,6 @@ export interface SyncResult {
   success: boolean
   message: string
   synced_products?: number
+  synced_orders?: number
   errors?: string[]
 } 

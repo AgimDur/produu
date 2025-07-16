@@ -1,23 +1,21 @@
 import Shopify from 'shopify-api-node'
-import { ShopifyStore, ShopifyProductData, SyncResult } from '@/types/shopify'
-import { ShopifyOrder } from '@/types/order'
-import { Product } from '@/types/product'
+import { ShopifyStore } from '@/types/shopify'
 
 export class ShopifyClient {
-  private shopify: Shopify
+  private client: Shopify
 
   constructor(store: ShopifyStore) {
-    this.shopify = new Shopify({
+    this.client = new Shopify({
       shopName: store.shopify_domain,
       accessToken: store.access_token,
-      apiVersion: '2024-01' // Use latest stable version
+      apiVersion: '2024-01'
     })
   }
 
-  // Test connection to Shopify store
+  // Test connection to Shopify
   async testConnection(): Promise<boolean> {
     try {
-      await this.shopify.shop.get()
+      await this.client.shop.get()
       return true
     } catch (error) {
       console.error('Shopify connection test failed:', error)
@@ -25,221 +23,89 @@ export class ShopifyClient {
     }
   }
 
-  // Get store information
-  async getShopInfo() {
-    try {
-      return await this.shopify.shop.get()
-    } catch (error) {
-      console.error('Failed to get shop info:', error)
-      throw error
-    }
-  }
-
   // Get all products from Shopify
-  async getProducts(limit = 250): Promise<ShopifyProductData[]> {
+  async getProducts(): Promise<any[]> {
     try {
-      const products = await this.shopify.product.list({ limit })
-      return products as unknown as ShopifyProductData[]
+      const products = await this.client.product.list({ limit: 250 })
+      return products
     } catch (error) {
-      console.error('Failed to fetch Shopify products:', error)
+      console.error('Error getting Shopify products:', error)
       throw error
     }
   }
 
   // Get all orders from Shopify
-  async getOrders(limit = 250, status = 'any'): Promise<ShopifyOrder[]> {
+  async getOrders(limit: number = 50, status: string = 'any'): Promise<any[]> {
     try {
-      const orders = await this.shopify.order.list({ limit, status })
-      return orders as unknown as ShopifyOrder[]
-    } catch (error) {
-      console.error('Failed to fetch Shopify orders:', error)
-      throw error
-    }
-  }
-
-  // Get a single order by ID
-  async getOrder(orderId: number): Promise<ShopifyOrder> {
-    try {
-      const order = await this.shopify.order.get(orderId)
-      return order as unknown as ShopifyOrder
-    } catch (error) {
-      console.error('Failed to fetch Shopify order:', error)
-      throw error
-    }
-  }
-
-  // Create a product in Shopify
-  async createProduct(product: Product): Promise<ShopifyProductData> {
-    try {
-      const shopifyProduct = {
-        title: product.name,
-        body_html: product.description || '',
-        vendor: 'Default Vendor',
-        product_type: product.category,
-        status: 'active',
-        variants: [
-          {
-            price: (product.price / 100).toString(), // Convert from cents
-            sku: product.sku,
-            inventory_quantity: product.stock,
-            inventory_management: 'shopify',
-            barcode: product.ean13 || undefined
-          }
-        ]
-      }
-
-      const createdProduct = await this.shopify.product.create(shopifyProduct)
-      return createdProduct as unknown as ShopifyProductData
-    } catch (error) {
-      console.error('Failed to create Shopify product:', error)
-      throw error
-    }
-  }
-
-  // Update a product in Shopify
-  async updateProduct(shopifyProductId: number, product: Product): Promise<ShopifyProductData> {
-    try {
-      const updateData = {
-        title: product.name,
-        body_html: product.description || '',
-        vendor: 'Default Vendor',
-        product_type: product.category,
-        variants: [
-          {
-            price: (product.price / 100).toString(),
-            sku: product.sku,
-            inventory_quantity: product.stock,
-            inventory_management: 'shopify',
-            barcode: product.ean13 || undefined
-          }
-        ]
-      }
-
-      const updatedProduct = await this.shopify.product.update(shopifyProductId, updateData)
-      return updatedProduct as unknown as ShopifyProductData
-    } catch (error) {
-      console.error('Failed to update Shopify product:', error)
-      throw error
-    }
-  }
-
-  // Delete a product from Shopify
-  async deleteProduct(shopifyProductId: number): Promise<void> {
-    try {
-      await this.shopify.product.delete(shopifyProductId)
-    } catch (error) {
-      console.error('Failed to delete Shopify product:', error)
-      throw error
-    }
-  }
-
-  // Update inventory for a product variant
-  async updateInventory(inventoryItemId: number, quantity: number): Promise<void> {
-    try {
-      await this.shopify.inventoryLevel.set({
-        inventory_item_id: inventoryItemId,
-        location_id: await this.getMainLocationId(),
-        available: quantity
+      const orders = await this.client.order.list({ 
+        limit, 
+        status,
+        fields: 'id,order_number,email,customer,total_price,subtotal_price,total_tax,currency,financial_status,fulfillment_status,tags,note,processed_at,cancelled_at,shipping_address,billing_address'
       })
+      return orders
     } catch (error) {
-      console.error('Failed to update inventory:', error)
+      console.error('Error getting Shopify orders:', error)
       throw error
     }
   }
 
-  // Get the main location ID (usually the first location)
-  private async getMainLocationId(): Promise<number> {
+  // Sync products to Shopify
+  async syncProductsToShopify(products: any[]): Promise<any> {
     try {
-      const locations = await this.shopify.location.list()
-      return locations[0]?.id || 1 // Default to 1 if no locations found
-    } catch (error) {
-      console.error('Failed to get location ID:', error)
-      return 1 // Fallback
-    }
-  }
+      let syncedCount = 0
+      const errors: string[] = []
 
-  // Sync local products to Shopify
-  async syncProductsToShopify(localProducts: Product[]): Promise<SyncResult> {
-    const result: SyncResult = {
-      success: true,
-      message: 'Sync completed successfully',
-      synced_products: 0,
-      errors: []
-    }
+      for (const product of products) {
+        try {
+          // Check if product exists in Shopify
+          const existingProducts = await this.client.product.list({
+            title: product.name,
+            limit: 1
+          })
 
-    for (const product of localProducts) {
-      try {
-        // Check if product already exists in Shopify
-        const existingProducts = await this.shopify.product.list({ 
-          limit: 1, 
-          sku: product.sku 
-        })
-
-        if (existingProducts.length > 0) {
-          // Update existing product
-          await this.updateProduct(existingProducts[0].id, product)
-        } else {
-          // Create new product
-          await this.createProduct(product)
+          if (existingProducts.length > 0) {
+            // Update existing product
+            await this.client.product.update(existingProducts[0].id, {
+              title: product.name,
+              body_html: product.description || '',
+              vendor: product.category,
+              product_type: product.sku_level,
+              tags: product.sku,
+              variants: [{
+                price: (product.price / 100).toString(),
+                inventory_quantity: product.stock,
+                sku: product.sku
+              }]
+            })
+          } else {
+            // Create new product
+            await this.client.product.create({
+              title: product.name,
+              body_html: product.description || '',
+              vendor: product.category,
+              product_type: product.sku_level,
+              tags: product.sku,
+              variants: [{
+                price: (product.price / 100).toString(),
+                inventory_quantity: product.stock,
+                sku: product.sku
+              }]
+            })
+          }
+          syncedCount++
+        } catch (error) {
+          errors.push(`Product ${product.name}: ${error}`)
         }
-
-        result.synced_products!++
-      } catch (error) {
-        const errorMessage = `Failed to sync product ${product.sku}: ${error}`
-        result.errors!.push(errorMessage)
-        console.error(errorMessage)
       }
-    }
 
-    if (result.errors!.length > 0) {
-      result.success = false
-      result.message = `Sync completed with ${result.errors!.length} errors`
-    }
-
-    return result
-  }
-
-  // Get inventory levels for all products
-  async getInventoryLevels(): Promise<unknown[]> {
-    try {
-      const inventoryLevels = await this.shopify.inventoryLevel.list({})
-      return inventoryLevels
+      return {
+        success: errors.length === 0,
+        message: `Synced ${syncedCount} products to Shopify`,
+        synced_products: syncedCount,
+        errors
+      }
     } catch (error) {
-      console.error('Failed to fetch inventory levels:', error)
-      throw error
-    }
-  }
-
-  // Get all webhooks
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async getWebhooks(): Promise<any[]> {
-    try {
-      const webhooks = await this.shopify.webhook.list()
-      return webhooks
-    } catch (error) {
-      console.error('Failed to fetch webhooks:', error)
-      throw error
-    }
-  }
-
-  // Create a webhook
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async createWebhook(webhookData: any): Promise<any> {
-    try {
-      const webhook = await this.shopify.webhook.create(webhookData)
-      return webhook
-    } catch (error) {
-      console.error('Failed to create webhook:', error)
-      throw error
-    }
-  }
-
-  // Delete a webhook
-  async deleteWebhook(webhookId: number): Promise<void> {
-    try {
-      await this.shopify.webhook.delete(webhookId)
-    } catch (error) {
-      console.error('Failed to delete webhook:', error)
+      console.error('Error syncing products to Shopify:', error)
       throw error
     }
   }
